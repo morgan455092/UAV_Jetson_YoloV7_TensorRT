@@ -6,7 +6,7 @@ import random
 import ctypes
 import pycuda.driver as cuda
 import time
-
+import math
 
 EXPLICIT_BATCH = 1 << (int)(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
 host_inputs  = []
@@ -190,7 +190,7 @@ class YoloTRT():
         cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
 
         # 計算車輛座標
-        target_x, target_y = get_target_position(
+        target_x, target_y = self.get_target_position(
             int(x[0]),
             int(x[1]), 
             int(x[2]), 
@@ -207,6 +207,7 @@ class YoloTRT():
             cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA,)
     
     def get_target_position(
+        self,
         bbox_x1, 
         bbox_y1, 
         bbox_x2, 
@@ -248,8 +249,8 @@ class YoloTRT():
 
         # 車輛實際地理座標
         ##################################這裡需要再修改成TWD97運算#######################################
-        car_x = drone_x + car_delta_x
-        car_y = drone_y + car_delta_y
+        car_x = round(drone_x + car_delta_x, 3)
+        car_y = round(drone_y + car_delta_y, 3)
 
         # target_x = drone_x + 2*height*math.tan(hfov_rad/2)*(bbox_x-0.5)
         # target_y = drone_y + 2*height*math.tan(vfov_rad/2)*(0.5-bbox_y)

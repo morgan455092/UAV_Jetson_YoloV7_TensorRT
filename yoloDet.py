@@ -104,6 +104,10 @@ class YoloTRT():
             det["box"] = box 
             det_res.append(det)
             self.PlotBbox(box, img, label="{}:{:.2f}".format(self.categories[int(result_classid[j])], result_scores[j]),)
+        
+        # 加上座標框在圖片中央
+        self.PlotCord(img)
+
         return det_res, t2-t1
 
     def PostProcess(self, output, origin_h, origin_w):
@@ -189,6 +193,7 @@ class YoloTRT():
         c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
         cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
 
+'''
         # 計算車輛座標
         target_x, target_y = self.get_target_position(
             int(x[0]),
@@ -196,8 +201,8 @@ class YoloTRT():
             int(x[2]), 
             int(x[3]),
         )
-
-        label = label + ' (' + str(target_x) + ', '+ str(target_y) + ')'
+'''
+        # label = label + ' (' + str(target_x) + ', '+ str(target_y) + ')'
 
         if label:
             tf = max(tl - 1, 1)  # font thickness
@@ -206,6 +211,7 @@ class YoloTRT():
             cv2.rectangle(img, c1, c2, color, -1, cv2.LINE_AA)  # filled
             cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA,)
     
+    '''
     def get_target_position(
         self,
         bbox_x1, 
@@ -216,7 +222,7 @@ class YoloTRT():
         drone_y=0,
         drone_direction = 0,
         height=60, 
-        hfov_degree=90, 
+        hfov_degree=90,
         vfov_degree=90,
         image_w = 1000,
         image_h = 1000,
@@ -255,3 +261,16 @@ class YoloTRT():
         # target_x = drone_x + 2*height*math.tan(hfov_rad/2)*(bbox_x-0.5)
         # target_y = drone_y + 2*height*math.tan(vfov_rad/2)*(0.5-bbox_y)
         return car_x, car_y
+    '''
+
+    def PlotCord(self, img):
+        cord_x, cord_y = 248170.787, 2652129.936 
+        text = '(' + str(cord_x) + ', ' + str(cord_y) + ')'
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 1
+        color = (255, 0, 0)  # 藍色
+        (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness=1)
+        height, width, channels = img.shape
+        x = (width - text_width) // 2
+        y = (height + text_height + baseline) // 2
+        cv2.putText(img, text, (x, y), font, font_scale, color, thickness=2)

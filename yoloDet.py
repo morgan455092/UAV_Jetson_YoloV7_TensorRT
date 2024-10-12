@@ -193,7 +193,7 @@ class YoloTRT():
         c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
         cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
 
-'''
+        '''
         # 計算車輛座標
         target_x, target_y = self.get_target_position(
             int(x[0]),
@@ -201,9 +201,9 @@ class YoloTRT():
             int(x[2]), 
             int(x[3]),
         )
-'''
+        '''
         # label = label + ' (' + str(target_x) + ', '+ str(target_y) + ')'
-
+        
         if label:
             tf = max(tl - 1, 1)  # font thickness
             t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]

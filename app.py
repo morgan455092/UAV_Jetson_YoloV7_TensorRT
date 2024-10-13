@@ -48,9 +48,11 @@ def read_gps_data(port, baudrate):
     
     with serial.Serial(port, baudrate, timeout=1) as ser:
         while True:
+            global latitude
+            global longitude
             line = ser.readline().decode('ascii', errors='replace').strip()
-            global latitude, global longitude = parse_gnrmc(line)
-            if global latitude and global longitude:
+            latitude, longitude = parse_gnrmc(line)
+            if latitude and longitude:
                 lat = int(global latitude * 1E7)
                 lon = int(global longitude * 1E7)
 

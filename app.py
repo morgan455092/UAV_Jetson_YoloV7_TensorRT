@@ -53,8 +53,8 @@ def read_gps_data(port, baudrate):
             line = ser.readline().decode('ascii', errors='replace').strip()
             latitude, longitude = parse_gnrmc(line)
             if latitude and longitude:
-                lat = int(global latitude * 1E7)
-                lon = int(global longitude * 1E7)
+                lat = int(latitude * 1E7)
+                lon = int(longitude * 1E7)
 
                 # 輸出連續5次相同的數據，保持5Hz
                 for _ in range(5):
@@ -138,10 +138,12 @@ threads.append(t)
 t.start()
 
 while True:
+    global latitude
+    global longitude
     ret, frame = cap.read()
     frame = imutils.resize(frame, width=600)
     detections, t = model.Inference(frame)
-    PlotCord(frame, global latitude, global longitude) 
+    PlotCord(frame, latitude, longitude) 
     # for obj in detections:
     #    print(obj['class'], obj['conf'], obj['box'])
     # print("FPS: {} sec".format(1/t))

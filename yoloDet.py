@@ -106,7 +106,7 @@ class YoloTRT():
             self.PlotBbox(box, img, label="{}:{:.2f}".format(self.categories[int(result_classid[j])], result_scores[j]),)
         
         # 加上座標框在圖片中央
-        self.PlotCord(img)
+        # self.PlotCord(img, latitude, longitude)
 
         return det_res, t2-t1
 
@@ -262,15 +262,3 @@ class YoloTRT():
         # target_y = drone_y + 2*height*math.tan(vfov_rad/2)*(0.5-bbox_y)
         return car_x, car_y
     '''
-
-    def PlotCord(self, img):
-        cord_x, cord_y = 248170.787, 2652129.936 
-        text = '(' + str(cord_x) + ', ' + str(cord_y) + ')'
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 1
-        color = (255, 0, 0)  # 藍色
-        (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness=1)
-        height, width, channels = img.shape
-        x = (width - text_width) // 2
-        y = (height + text_height + baseline) // 2
-        cv2.putText(img, text, (x, y), font, font_scale, color, thickness=2)

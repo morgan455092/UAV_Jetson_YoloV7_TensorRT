@@ -1,13 +1,6 @@
-import sys
-import cv2 
-import imutils
-from yoloDet import YoloTRT
-
 import serial
 from pymavlink import mavutil
 import time
-
-import threading
 
 def parse_gnrmc(data):
     if data.startswith('$PLSATTIT'):
@@ -51,10 +44,10 @@ def read_gps_data(port, baudrate):
     with serial.Serial(port, baudrate, timeout=1) as ser:
         while True:
             line = ser.readline().decode('ascii', errors='replace').strip()
-            global latitude, global longitude = parse_gnrmc(line)
-            if global latitude and global longitude:
-                lat = int(global latitude * 1E7)
-                lon = int(global longitude * 1E7)
+            latitude, longitude = parse_gnrmc(line)
+            if latitude and longitude:
+                lat = int(latitude * 1E7)
+                lon = int(longitude * 1E7)
 
                 # 輸出連續5次相同的數據，保持5Hz
                 for _ in range(5):
@@ -83,72 +76,5 @@ def read_gps_data(port, baudrate):
                     )
                     time.sleep(0.15)  # 每0.2秒輸出一次，達到5Hz
 
-def PlotCord(img, latitude, longitude):
-    text = '(' + str(longitude) + ', ' + str(latitude) + ')'
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1
-    color = (255, 0, 0)  # 藍色
-    (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness=1)
-    height, width, channels = img.shape
-    x = (width - text_width) // 2
-    y = (height + text_height + baseline) // 2
-    cv2.putText(img, text, (x, y), font, font_scale, color, thickness=2)
-
-def gstreamer_pipeline(
-    sensor_id=0,
-    capture_width=1920,
-    capture_height=1080,
-    display_width=960,
-    display_height=540,
-    framerate=30,
-    flip_method=0,
-):
-    return (
-        "nvarguscamerasrc sensor-id=%d ! "
-        "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, framerate=(fraction)%d/1 ! "
-        "nvvidconv flip-method=%d ! "
-        "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
-        "videoconvert ! "
-        "video/x-raw, format=(string)BGR ! appsink"
-        % (
-            sensor_id,
-            capture_width,
-            capture_height,
-            framerate,
-            flip_method,
-            display_width,
-            display_height,
-        )
-    )
-
-latitude, longitude = 0.0, 0.0
-
-# use path for library and engine file
-model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bestV2.engine", conf=0.5, yolo_ver="v7")
-
-# 使用影片來源
-# cap = cv2.VideoCapture("videos/testvideo.mp4")
-
-# 使用CSI鏡頭
-cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
-
-# read_gps_data('/dev/ttyUSB0', 115200)  # 根據實際情況修改端口名稱
-t = threading.Thread(target=read_gps_data, args=('/dev/ttyUSB0', 115200))
-threads.append(t)
-t.start()
-
-while True:
-    ret, frame = cap.read()
-    frame = imutils.resize(frame, width=600)
-    detections, t = model.Inference(frame)
-    PlotCord(frame, global latitude, global longitude) 
-    # for obj in detections:
-    #    print(obj['class'], obj['conf'], obj['box'])
-    # print("FPS: {} sec".format(1/t))
-    cv2.imshow("Output", frame)
-    key = cv2.waitKey(1)
-    if key == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    read_gps_data('/dev/ttyUSB0', 115200)  # 根據實際情況修改端口名稱

@@ -5,8 +5,6 @@ from yoloDet import YoloTRT
 
 import serial
 from pymavlink import mavutil
-import time
-
 import threading
 
 def parse_gnrmc(data):

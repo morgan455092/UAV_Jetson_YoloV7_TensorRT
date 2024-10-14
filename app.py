@@ -15,7 +15,7 @@ def read_gps_data():
     return latitude, longitude
 
 def PlotCord(img, latitude, longitude):
-    text = '(' + str(longitude) + ', ' + str(latitude) + ')'
+    text = '(' + str(latitude) + ', ' + str(longitude) + ')'
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 1
     color = (255, 0, 0)  # 藍色
@@ -66,7 +66,13 @@ model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bes
 # cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 
 # USB
-cap = cv2.VideoCapture(0)
+camera_id = "/dev/video0"
+cap = cv2.VideoCapture(camera_id, cv2.CAP_V4L2)
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'YUYV'))
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+cap.set(cv2.CAP_PROP_FPS, 30)
 
 while True:
     ret, frame = cap.read()
@@ -74,7 +80,7 @@ while True:
     detections, t = model.Inference(frame)
     latitude_wgs84, longitude_wgs84 = read_gps_data()
     latitude_twd97, longitude_twd97 = twd97.fromwgs84(latitude_wgs84, longitude_wgs84)
-    PlotCord(frame, latitude, longitude) 
+    PlotCord(frame, latitude_twd97, longitude_twd97)
     # for obj in detections:
     #    print(obj['class'], obj['conf'], obj['box'])
     # print("FPS: {} sec".format(1/t))

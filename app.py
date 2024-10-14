@@ -42,7 +42,7 @@ def convert_to_degrees(value, direction):
     return result
 
 def read_gps_data(port, baudrate):
-    master = mavutil.mavlink_connection('/dev/ttyAMA1', baud=115200)
+    master = mavutil.mavlink_connection('/dev/ttyUSB3', baud=115200)
     master.wait_heartbeat()
     print("Heartbeat from system (system %u component %u)" % (master.target_system, master.target_component))
     
@@ -136,7 +136,7 @@ cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 video_capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
 # read_gps_data('/dev/ttyUSB0', 115200)  # 根據實際情況修改端口名稱
-t = threading.Thread(target=read_gps_data, args=('/dev/ttyUSB0', 115200))
+t = threading.Thread(target=read_gps_data, args=('/dev/ttyUSB1', 115200))
 t.start()
 
 while True:

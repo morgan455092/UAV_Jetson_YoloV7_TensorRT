@@ -1,3 +1,0 @@
-#!/bin/bash
- 
-svn checkout http://svn.berlios.de/svnroot/repos/linux-uvc/linux-uvc/trunk

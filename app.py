@@ -137,7 +137,7 @@ model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bes
 # cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 
 # USB
-cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+cap = cv2.VideoCapture(0)
 
 while True:
     ret, frame = cap.read()

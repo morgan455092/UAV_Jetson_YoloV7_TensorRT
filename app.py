@@ -2,6 +2,7 @@ import sys
 import cv2 
 import imutils
 from yoloDet import YoloTRT
+import twd97
 
 def read_gps_data():
     with open('PLSATTIT_data.txt', 'r') as f:
@@ -71,7 +72,8 @@ while True:
     ret, frame = cap.read()
     frame = imutils.resize(frame, width=1280)
     detections, t = model.Inference(frame)
-    latitude, longitude = read_gps_data()
+    latitude_wgs84, longitude_wgs84 = read_gps_data()
+    latitude_twd97, longitude_twd97 = twd97.fromwgs84(latitude_wgs84, longitude_wgs84)
     PlotCord(frame, latitude, longitude) 
     # for obj in detections:
     #    print(obj['class'], obj['conf'], obj['box'])

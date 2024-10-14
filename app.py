@@ -121,42 +121,36 @@ def gstreamer_pipeline(
         )
     )
 
-def run_yolo_tensorrt():
-
-    global latitude
-    global longitude
-    # use path for library and engine file
-    model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bestV2.engine", conf=0.5, yolo_ver="v7")
-
-    # 使用影片來源
-    # cap = cv2.VideoCapture("videos/testvideo.mp4")
-
-    # 使用CSI鏡頭
-    # cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
-
-    # USB
-    video_capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
-
-    while True:
-        ret, frame = cap.read()
-        frame = imutils.resize(frame, width=1280)
-        detections, t = model.Inference(frame)
-        PlotCord(frame, latitude, longitude) 
-        # for obj in detections:
-        #    print(obj['class'], obj['conf'], obj['box'])
-        # print("FPS: {} sec".format(1/t))
-        cv2.imshow("Output", frame)
-        key = cv2.waitKey(1)
-        if key == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-
 latitude, longitude = 1.0, 1.0
+
 # read_gps_data('/dev/ttyUSB0', 115200)  # 根據實際情況修改端口名稱
 a = threading.Thread(target=read_gps_data, args=('/dev/ttyUSB1', 115200))
-b = threading.Thread(target=run_yolo_tensorrt)
 a.start()
-b.start()
+
+# use path for library and engine file
+model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bestV2.engine", conf=0.5, yolo_ver="v7")
+
+# 使用影片來源
+# cap = cv2.VideoCapture("videos/testvideo.mp4")
+
+# 使用CSI鏡頭
+# cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
+
+# USB
+cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+
+while True:
+    ret, frame = cap.read()
+    frame = imutils.resize(frame, width=1280)
+    detections, t = model.Inference(frame)
+    PlotCord(frame, latitude, longitude) 
+    # for obj in detections:
+    #    print(obj['class'], obj['conf'], obj['box'])
+    # print("FPS: {} sec".format(1/t))
+    cv2.imshow("Output", frame)
+    key = cv2.waitKey(1)
+    if key == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()

@@ -7,3 +7,5 @@ psutil
 tqdm==4.64.1
 imutils
 twd97
+pymavlink
+serial

@@ -132,14 +132,14 @@ model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bes
 # 使用CSI鏡頭
 cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 
+# USB
+video_capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
+
 # read_gps_data('/dev/ttyUSB0', 115200)  # 根據實際情況修改端口名稱
 t = threading.Thread(target=read_gps_data, args=('/dev/ttyUSB0', 115200))
-threads.append(t)
 t.start()
 
 while True:
-    global latitude
-    global longitude
     ret, frame = cap.read()
     frame = imutils.resize(frame, width=600)
     detections, t = model.Inference(frame)

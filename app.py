@@ -42,14 +42,14 @@ def convert_to_degrees(value, direction):
     return result
 
 def read_gps_data(port, baudrate):
-    master = mavutil.mavlink_connection('/dev/ttyUSB3', baud=115200)
+    global latitude
+    global longitude
+    master = mavutil.mavlink_connection('/dev/ttyUSB0', baud=115200)
     master.wait_heartbeat()
     print("Heartbeat from system (system %u component %u)" % (master.target_system, master.target_component))
     
     with serial.Serial(port, baudrate, timeout=1) as ser:
         while True:
-            global latitude
-            global longitude
             line = ser.readline().decode('ascii', errors='replace').strip()
             latitude, longitude = parse_gnrmc(line)
             if latitude and longitude:
@@ -121,36 +121,42 @@ def gstreamer_pipeline(
         )
     )
 
-latitude, longitude = 0.0, 0.0
+def run_yolo_tensorrt():
 
-# use path for library and engine file
-model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bestV2.engine", conf=0.5, yolo_ver="v7")
+    global latitude
+    global longitude
+    # use path for library and engine file
+    model = YoloTRT(library="yolov7/build/libmyplugins.so", engine="yolov7/build/bestV2.engine", conf=0.5, yolo_ver="v7")
 
-# 使用影片來源
-# cap = cv2.VideoCapture("videos/testvideo.mp4")
+    # 使用影片來源
+    # cap = cv2.VideoCapture("videos/testvideo.mp4")
 
-# 使用CSI鏡頭
-cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
+    # 使用CSI鏡頭
+    # cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 
-# USB
-video_capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    # USB
+    video_capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
+    while True:
+        ret, frame = cap.read()
+        frame = imutils.resize(frame, width=1280)
+        detections, t = model.Inference(frame)
+        PlotCord(frame, latitude, longitude) 
+        # for obj in detections:
+        #    print(obj['class'], obj['conf'], obj['box'])
+        # print("FPS: {} sec".format(1/t))
+        cv2.imshow("Output", frame)
+        key = cv2.waitKey(1)
+        if key == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+latitude, longitude = 1.0, 1.0
 # read_gps_data('/dev/ttyUSB0', 115200)  # 根據實際情況修改端口名稱
-t = threading.Thread(target=read_gps_data, args=('/dev/ttyUSB1', 115200))
-t.start()
-
-while True:
-    ret, frame = cap.read()
-    frame = imutils.resize(frame, width=600)
-    detections, t = model.Inference(frame)
-    PlotCord(frame, latitude, longitude) 
-    # for obj in detections:
-    #    print(obj['class'], obj['conf'], obj['box'])
-    # print("FPS: {} sec".format(1/t))
-    cv2.imshow("Output", frame)
-    key = cv2.waitKey(1)
-    if key == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+a = threading.Thread(target=read_gps_data, args=('/dev/ttyUSB1', 115200))
+b = threading.Thread(target=run_yolo_tensorrt)
+a.start()
+b.start()

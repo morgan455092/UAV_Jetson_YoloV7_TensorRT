@@ -37,7 +37,7 @@ def convert_to_degrees(value, direction):
     return result
 
 def read_gps_data(port, baudrate):
-    master = mavutil.mavlink_connection('/dev/ttyAMA1', baud=115200)
+    master = mavutil.mavlink_connection('/dev/ttyUSB0', baud=115200)
     master.wait_heartbeat()
     print("Heartbeat from system (system %u component %u)" % (master.target_system, master.target_component))
     
@@ -77,4 +77,4 @@ def read_gps_data(port, baudrate):
                     time.sleep(0.15)  # 每0.2秒輸出一次，達到5Hz
 
 if __name__ == "__main__":
-    read_gps_data('/dev/ttyUSB0', 115200)  # 根據實際情況修改端口名稱
+    read_gps_data('/dev/ttyUSB1', 115200)  # 根據實際情況修改端口名稱

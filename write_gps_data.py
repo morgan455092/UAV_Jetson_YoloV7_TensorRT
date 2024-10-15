@@ -1,3 +1,5 @@
+import time
+
 start_lat = 23.45055556
 start_lon = 120.28611111
 end_lat = 23.45222222
@@ -5,6 +7,8 @@ end_lon = 120.27861111
 
 lat = start_lat
 lon = start_lon
+
+time.sleep(250)
 
 for _ in range(0,130):
     lat = lat + (end_lat - start_lat)/130

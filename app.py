@@ -5,12 +5,21 @@ from yoloDet import YoloTRT
 import twd97
 
 def read_gps_data():
+    '''
     with open('PLSATTIT_data.txt', 'r') as f:
         data = f.readlines()[-1]
         parts = data.split(',')
         latitude = parts[9]
         latitude = float(latitude)
         longitude = parts[10]
+        longitude = float(longitude)
+    '''
+    with open('PLSATTIT_data.txt', 'r') as f:
+        data = f.readlines()[-1]
+        parts = data.split(',')
+        latitude = parts[0]
+        latitude = float(latitude)
+        longitude = parts[1]
         longitude = float(longitude)
     return latitude, longitude
 

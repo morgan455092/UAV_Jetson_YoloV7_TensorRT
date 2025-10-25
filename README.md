@@ -2,6 +2,10 @@
 
 使用TensorRT引擎於Jetson上運行YoloV7，執行無人機目標獲得及定位技術。
 
+## 原始專案
+
+[mailrocketsystems|JetsonYoloV7-TensorRT](https://github.com/mailrocketsystems/JetsonYoloV7-TensorRT)
+
 ## 環境安裝
 
 ```
